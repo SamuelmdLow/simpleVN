@@ -1,16 +1,52 @@
 [classroom.jpg]
 
-Naruto (happy): hello
+Blonde (happy): hello
 
 Low (happy): hi, nice to meet you
 Low (shy): do you want to go outside
 
-Naruto (happy): okay!
+Blonde (happy): okay!
 
 [bridge.jpg]
 
-Naruto (happy): aaahhhuhguggghhh
+Blonde (happy): aaahhhuhguggghhh
 
 Low (shy): what happened?
 
-Naruto (happy): its very cold outside
+Blonde (happy): its very cold outside
+
+Guy (happy): hello!
+
+Low (happy): hi!
+
+Blonde (happy): hi!
+
+Guy (happy): What have you been doing today?
+
+Blonde (angry): Your mom.
+
+Low (shy): ...
+
+Guy (idle): ...
+
+Blonde (idle): ...
+
+Guy (idle): ...
+
+Guy (angry): HOWDAREYOUSAYSUCHATHINGABOUTMYMOTHER WHYIOUGHTATEACHYOUALESSONYOUHEARME
+
+Guy (angry): IMVERYUPSETWITHYOUFORTHISJOKE!!!
+
+Low (shy): sorry he didn't mean it!!!
+
+Blonde (happy): yeah!
+
+Guy (idle): oh...
+
+Guy (happy): Well I guess thats okay then!
+
+Guy (happy): Lets go back to school together!
+
+Low (happy): Okay!
+
+[classroom.jpg]

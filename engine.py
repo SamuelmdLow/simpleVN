@@ -12,7 +12,8 @@ class Engine():
         self.textbox = TextBox("images/UI/textbox.svg", 0, 0.75, width=0.75)
         self.textbox.centerX()
 
-        self.character = Sprite("images/characters/Naruto/happy/Naruto.png", 0.3, 0.15, height=1.5)
+        self.character = Sprite("images/characters/Guy/idle/guyIdle.png", 0, -0.1, height=1.5)
+        self.character.centerX()
 
         self.stage = "None"
         self.clock = pygame.time.Clock()
@@ -46,7 +47,6 @@ class Engine():
             #print(i)
             for sprite in fadingSprites:
                 sprite.fade(255/amountOfFrames*fadeDir)
-                #print(sprite.alpha)
 
             updateScreen(sprites)
             pygame.display.flip()
@@ -123,7 +123,7 @@ class Engine():
         for line in content:
             if line[0] == "[":
                 self.background.image = "images/backgrounds/"+line[1:-1]
-                self.fadeAll([], [self.background])
+                self.fadeAll([self.background], [self.background], amountOfFrames=15)
 
             else:
                 if "|" in line:

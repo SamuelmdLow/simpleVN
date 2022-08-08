@@ -4,117 +4,143 @@ import pathlib
 from pygame.locals import *
 from classes import *
 
-background = Sprite("images/backgrounds/bridge.jpg", 0, 0, width=1)
-background.centerX()
+class Engine():
+    def __init__(self):
+        self.background = Sprite("images/backgrounds/bridge.jpg", 0, 0, width=1)
+        self.background.centerX()
 
-textbox = TextBox("images/UI/textbox.svg", 0, 0.75, width=0.75)
-textbox.centerX()
+        self.textbox = TextBox("images/UI/textbox.svg", 0, 0.75, width=0.75)
+        self.textbox.centerX()
 
-character = Sprite("images/characters/Low/happy/happy1.png", 0.3, 0.15, height=1.5)
-# HWSURFACE | DOUBLEBUF
-character.loadAnimation("images/characters/Low/happy")
+        self.character = Sprite("images/characters/Naruto/happy/Naruto.png", 0.3, 0.15, height=1.5)
 
-textbox.text = 'Hello my name is sam low. I love going to school and learning things. My favourite subject at school is math. I love to math!'
+        self.stage = "None"
+        self.clock = pygame.time.Clock()
 
-stage = "None"
+    def fadeAll(self, sprites, fadingSprites, amountOfFrames=3, fadeDir=1):
 
-clock = pygame.time.Clock()
-
-def fadeAll(sprites, fadingSprites, amountOfFrames=3, fadeDir=1):
-
-    if fadeDir == 1:
-        for sprite in fadingSprites:
-            sprite.alpha = 0
-    else:
-        for sprite in fadingSprites:
-            sprite.alpha = 255
-
-    updateScreen(sprites)
-    pygame.display.flip()
-
-    for i in range(amountOfFrames):
-        clock.tick(settings.framerate)
-        for event in pygame.event.get():
-            windowCheck(event)
-
-        if pygame.key.get_pressed()[K_SPACE]:
-            if fadeDir == 1:
-                for sprite in fadingSprites:
-                    sprite.alpha = 255
-            else:
-                for sprite in fadingSprites:
-                    sprite.alpha = 0
-            break
-
-        #print(i)
-        for sprite in fadingSprites:
-            sprite.fade(255/amountOfFrames*fadeDir)
-            #print(sprite.alpha)
+        if fadeDir == 1:
+            for sprite in fadingSprites:
+                sprite.alpha = 0
+        else:
+            for sprite in fadingSprites:
+                sprite.alpha = 255
 
         updateScreen(sprites)
         pygame.display.flip()
 
-    if fadeDir == 1:
-        for sprite in fadingSprites:
-            sprite.alpha = 255
-    else:
-        for sprite in fadingSprites:
-            sprite.alpha = 0
+        for i in range(amountOfFrames):
+            self.clock.tick(settings.framerate)
+            for event in pygame.event.get():
+                windowCheck(event)
 
-def dialogue(text="...", characterName=None, animation=None):
-    global stage, character, textbox, background
+            if pygame.key.get_pressed()[K_SPACE]:
+                if fadeDir == 1:
+                    for sprite in fadingSprites:
+                        sprite.alpha = 255
+                else:
+                    for sprite in fadingSprites:
+                        sprite.alpha = 0
+                break
 
-    finished = False
+            #print(i)
+            for sprite in fadingSprites:
+                sprite.fade(255/amountOfFrames*fadeDir)
+                #print(sprite.alpha)
 
-    fadingSprites = []
-    if stage != "dialouge":
-        fadingSprites.append(textbox)
-        fadingSprites.append(textbox.textbox)
-        fadingSprites.append(character)
+            updateScreen(sprites)
+            pygame.display.flip()
 
+        if fadeDir == 1:
+            for sprite in fadingSprites:
+                sprite.alpha = 255
+        else:
+            for sprite in fadingSprites:
+                sprite.alpha = 0
+
+    def dialogue(self, text="...", characterName=None, animation=None):
+        # stage, character, textbox, background
+
+        finished = False
+
+        fadingSprites = []
+        if self.stage != "dialouge":
+            fadingSprites.append(self.textbox)
+            fadingSprites.append(self.textbox.textbox)
+            fadingSprites.append(self.character)
+
+            if characterName != None:
+                self.character.name = characterName
+            self.stage = "dialouge"
+        else:
+            if characterName != self.character.name and characterName != None:
+                fadingSprites.append(self.character)
+
+                self.character.name = characterName
+
+        fadingSprites.append(self.textbox.textbox)
+
+        if animation != None:
+            self.character.loadAnimation("images/characters/"+characterName + "/" + animation)
+        self.textbox.text = text
+
+        sprites = [self.background]
         if characterName != None:
-            character.name = characterName
-        stage = "dialouge"
-    else:
-        if characterName != character.name and characterName != None:
-            fadingSprites.append(character)
+            sprites.append(self.character)
+        sprites.append(self.textbox)
 
-            character.name = characterName
+        self.fadeAll(sprites, fadingSprites)
 
-    fadingSprites.append(textbox.textbox)
+        while not finished:
+            self.clock.tick(settings.framerate)
+            for event in pygame.event.get():
+                windowCheck(event)
 
-    if animation != None:
-        character.loadAnimation("images/characters/"+characterName + "/" + animation)
-    textbox.text = text
+            if pygame.key.get_pressed()[K_SPACE]:
 
-    sprites = [background]
-    if characterName != None:
-        sprites.append(character)
-    sprites.append(textbox)
+                #fadingSprites = [textbox.textbox]
+                #fadeAll(sprites, fadingSprites, fadeDir=-1)
 
-    fadeAll(sprites, fadingSprites)
+                finished = True
 
-    while not finished:
-        clock.tick(settings.framerate)
-        for event in pygame.event.get():
-            windowCheck(event)
+            updateScreen(sprites)
 
-        if pygame.key.get_pressed()[K_SPACE]:
+            pygame.display.flip()
 
-            #fadingSprites = [textbox.textbox]
-            #fadeAll(sprites, fadingSprites, fadeDir=-1)
+    def playScript(self, file):
+        content = open("scripts/"+file).read()
+        while "\n\n" in content:
+            content = content.replace("\n\n", "\n")
 
-            finished = True
+        while "\n " in content:
+            content = content.replace("\n ", "\n")
 
-        updateScreen(sprites)
+        while " \n" in content:
+            content = content.replace(" \n", "\n")
 
-        pygame.display.flip()
+        content = content.split("\n")
 
+        for line in content:
+            if line[0] == "[":
+                self.background.image = "images/backgrounds/"+line[1:-1]
+                self.fadeAll([], [self.background])
+
+            else:
+                if "|" in line:
+                    if line.index("|") < line.index(":"):
+                        end = line.index("|")-1
+                    else:
+                        end = line.index("(") - 1
+                else:
+                    end = line.index("(") - 1
+
+                character = line[0: end]
+                animation = line[line.index("(")+1:line.index(")")]
+                text = line[line.index(":")+2:]
+
+                self.dialogue(text, characterName=character, animation=animation)
 
 if __name__ == "__main__":
-
+    game = Engine()
     while True:
-        dialogue(text="I love doing it", characterName="Low", animation="happy")
-        dialogue(text="By it I mean dancing", characterName="Low", animation="happy")
-        dialogue(text="I love dancing", characterName="Low", animation="happy")
-        dialogue(text="Yeah me too!", characterName="Naruto", animation="happy")
+        game.playScript("0.txt")

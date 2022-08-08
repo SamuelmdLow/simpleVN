@@ -1,4 +1,6 @@
 import sys
+from math import floor
+
 import pygame
 from pathlib import Path
 from pygame.locals import *
@@ -23,7 +25,10 @@ class Settings():
 class Sprite():
     def __init__(self, image, x, y, width=None, height=None):
         self.image = image
-        self.screen = pygame.image.load(image)
+        try:
+            self.screen = pygame.image.load(image)
+        except:
+            self.screen = pygame.Surface((1,1))
         self.ratio = self.screen.get_width()/self.screen.get_height()
         self.x = x
         self.y = y
@@ -34,6 +39,10 @@ class Sprite():
         self.frameGap = 3
         self.frameCount = 0
         self.looping = True
+
+        self.alpha = 255
+        self.fading = 0
+        self.name = ""
 
         if width != None:
             self.setWidth(width)
@@ -46,6 +55,7 @@ class Sprite():
         p = Path(file).glob('**/*')
         self.animation = [x for x in p if x.is_file()]
         self.frameCount = 0
+        self.frame = 0
 
     def setWidth(self, width):
         self.width = width
@@ -68,6 +78,15 @@ class Sprite():
         self.screen = pygame.image.load(image)
         self.ratio = self.screen.get_width()/self.screen.get_height()
 
+    def fade(self, amount):
+        newAlpha = self.alpha + amount
+        if newAlpha > 255:
+            self.alpha = 255
+        elif newAlpha < 0:
+            self.alpha = 0
+        else:
+            self.alpha = newAlpha
+
     def update(self):
         if len(self.animation) > 0:
             self.screen = pygame.transform.smoothscale(pygame.image.load(self.animation[self.frame]), (calcWidth(self.width), calcHeight(self.height)))
@@ -88,6 +107,8 @@ class Sprite():
                     self.frame -= 1
                     self.frameCount = None
 
+        self.screen.set_alpha(self.alpha)
+
     def stamp(self, surface):
         surface.blit(self.screen, (calcWidth(self.x), calcHeight(self.y)))
 
@@ -100,6 +121,7 @@ class TextBox(Sprite):
         self.fontName = font
         self.font = pygame.font.Font(font, int(calcHeight(textSize)))
         self.text = text
+        self.textbox = Sprite("", 0, 0)
 
     def getLines(self):
         self.font = pygame.font.Font(self.fontName, int(calcHeight(self.textSize)))
@@ -124,15 +146,25 @@ class TextBox(Sprite):
         return lines
 
     def update(self):
+        size = (calcWidth(self.width-(2*self.textMargin)), calcHeight(self.height-(2*self.textMargin)))
+        self.textbox.screen = pygame.Surface(size, pygame.SRCALPHA, 32)
+        self.textbox.screen = self.textbox.screen.convert_alpha()
+
         self.font = pygame.font.Font(self.fontName, int(calcHeight(self.textSize)))
         lines = self.getLines()
-        self.screen = pygame.transform.smoothscale(pygame.image.load(self.image), (calcWidth(self.width), calcHeight(self.height)))
         multi = 0
         topMargin = center((len(lines)*(self.textSize*self.lineSpacing)) - (self.textSize*(self.lineSpacing-1)), self.height)
         for line in lines:
             text = self.font.render(line, True, colour["black"])
-            self.screen.blit(text, (calcWidth(self.textMargin), calcHeight(topMargin) + calcHeight(self.textSize * multi * self.lineSpacing)))
+            self.textbox.screen.blit(text, (0, calcHeight(self.textSize * multi * self.lineSpacing)))
             multi += 1
+
+        self.textbox.screen.set_alpha(self.textbox.alpha)
+
+        self.screen = pygame.transform.smoothscale(pygame.image.load(self.image), (calcWidth(self.width), calcHeight(self.height)))
+        self.screen.blit(self.textbox.screen, (calcWidth(self.textMargin), calcHeight(topMargin)))
+
+        self.screen.set_alpha(self.alpha)
 
 def center(item, domain):
     return (domain - item)/2
